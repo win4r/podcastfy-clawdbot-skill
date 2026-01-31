@@ -62,6 +62,24 @@ Podcastfy prints the final MP3 path on success.
 - `PODCASTFY_EDGE_VOICE_Q` (default: `en-US-JennyNeural`)
 - `PODCASTFY_EDGE_VOICE_A` (default: `en-US-EricNeural`)
 
+## Automation / reliability tips (important)
+
+### Prefer RSS feeds over browser automation for cron jobs
+
+In isolated cron jobs, avoid relying on a system browser (Chrome/Chromium) or extra Python deps (e.g. `bs4`).
+For TechCrunch categories, prefer the RSS feed:
+- https://techcrunch.com/category/artificial-intelligence/feed/
+
+This reduces breakage from:
+- “No supported browser found …”
+- missing site parsing dependencies in the cron runtime
+
+### Validate MP3 output (avoid 0-second audio)
+
+We observed `podcastfy` can occasionally produce an MP3 that is effectively empty/truncated (e.g., a ~261-byte file), which shows up as **0s** in Telegram.
+
+This wrapper now validates MP3 output and will automatically fall back to **edge-tts** synthesis from the latest transcript when the MP3 is invalid.
+
 ## Safety / workflow
 
 - Prefer “draft-first”: tell the user what will be generated (language/length) before running.
